@@ -17,32 +17,7 @@
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-#define NUMFLAKES     10 // Number of snowflakes in the animation example
-
-#define LOGO_HEIGHT   16
-#define LOGO_WIDTH    16
-static const unsigned char PROGMEM logo_bmp[] =
-{ B00000000, B11000000,
-  B00000001, B11000000,
-  B00000001, B11000000,
-  B00000011, B11100000,
-  B11110011, B11100000,
-  B11111110, B11111000,
-  B01111110, B11111111,
-  B00110011, B10011111,
-  B00011111, B11111100,
-  B00001101, B01110000,
-  B00011011, B10100000,
-  B00111111, B11100000,
-  B00111111, B11110000,
-  B01111100, B11110000,
-  B01110000, B01110000,
-  B00000000, B00110000 };
-
   
-/* Comment this out to disable prints and save space */
-#define BLYNK_PRINT Serial
-
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 
@@ -52,14 +27,15 @@ char auth[] = "I6cEXCSWkCGpOx54E05v0P8RBV5ibEOf";
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
-char ssid[] = "15A2";
-char pass[] = "Edinburgh123";
-
+char ssid[] = "TALKTALK580025";
+char pass[] = "38E7YE86";
 
 //variables
-float Ttub;
-float Tamb;
+int Ttub;
+int Tamb;
 double Irms;
+int POWER;
+int display_toggle;
 
 // Setup a oneWire instance to communicate with any OneWire device
 OneWire oneWire(ONE_WIRE_BUS);  
@@ -69,15 +45,19 @@ EnergyMonitor emon1;
 // Pass oneWire reference to DallasTemperature library
 DallasTemperature sensors(&oneWire);
 
+BLYNK_WRITE(V3) { //Display Toggle
+  display_toggle = param.asInt(), DEC;
+}
+
 
 void setup(void)
 {
+  
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x32
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
   }
-
   // Clear the buffer
   display.clearDisplay();
   // display.display() is NOT necessary after every single drawing command,
@@ -88,13 +68,36 @@ void setup(void)
   display.setTextSize(1);             // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE);        // Draw white text
   display.setCursor(0,0);             // Start at top-left corner
-  display.println(F("   Connecting..."));
+  display.println(F("   Connecting to "));
+  display.setCursor(0,10);             // Start at top-left corner
+  display.println(F("WIFI - TALKTALK580025"));
+  display.setCursor(0,20);             // Start at top-left corner
+  display.println(F("Pswd - 38E7YE86"));
   display.display();
   delay(3000);
+  
+  Blynk.begin(auth, ssid, pass);
+  Blynk.syncAll();
+  
   testdrawcircle();    // Draw circles (outlines)
+  display.clearDisplay();
+  display.setTextSize(1);             // Normal 1:1 pixel scale
+  display.setTextColor(SSD1306_WHITE);        // Draw white text
+  display.setCursor(0,0);             // Start at top-left corner
+  display.println(F("     Welcome to"));
+  display.setTextSize(1.5);             // Normal 1:1 pixel scale
+  display.setCursor(0,10);             // Start at top-left corner
+  display.println(F("      Hot Tub"));
+  display.setCursor(0,20);             // Start at top-left corner
+  display.println(F("      Monitor!"));
+  display.display();
+  delay(3000);
+  
+  display.display();
+
   sensors.begin();  // Start up the library
 //  Serial.begin(9600);
-  Blynk.begin(auth, ssid, pass);
+ 
   emon1.current(A0, 111.1);             // Current: input pin, calibration.
 
 
@@ -108,6 +111,16 @@ void loop(void)
 
   Irms = emon1.calcIrms(1480);
 
+  if (Irms < 0.5){
+    Irms = 0;
+  }
+  
+  if (millis() < 12000){
+    Irms = 0;
+  }
+
+  POWER = 230*Irms;
+  
   // Send the command to get temperatures
   sensors.requestTemperatures(); 
 
@@ -120,27 +133,47 @@ void loop(void)
   Blynk.virtualWrite(V0, Ttub); //sending to 
   Blynk.virtualWrite(V1, Tamb); //sending to Blynk
   Blynk.virtualWrite(V2, Irms); //sending to Blynk
+  Blynk.virtualWrite(V4, POWER); //sending to Blynk
 
   display.clearDisplay();
+  display.display();
+
+if (display_toggle == 1){
 
   display.setTextSize(1);             // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE);        // Draw white text
   display.setCursor(0,0);             // Start at top-left corner
-  display.println(F("   Hot Tub Monitor"));
+  display.print(F("Power = "));
+  display.print(POWER);
+  display.println(" W");
+
 
   display.print("WaterTemp = ");
-  display.println(Ttub);
+  display.print(Ttub);
+  display.println(" C");
+
 
   display.print("AmbientTemp = ");
-  display.println(Tamb);
+  display.print(Tamb);
+  display.println(" C");
+
   
   display.print("Current = ");
   display.print(Irms);
   display.println(" Amps");
 
   display.display();
-  delay(2000);
 
+}
+  
+
+if (display_toggle == 0){
+
+  display.setCursor(0,0);             // Start at top-left corner
+  display.print(F("               "));
+  display.println(F("  OFF"));
+  display.display();
+}
 }
 
 void testdrawcircle(void) {
@@ -152,5 +185,5 @@ void testdrawcircle(void) {
     delay(1);
   }
 
-  delay(2000);
+  delay(1000);
 }
