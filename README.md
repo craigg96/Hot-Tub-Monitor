@@ -1,6 +1,6 @@
 # Hot-Tub-Monitor
 
-![hot_tub_monitor.png](https://github.com/craigg96/Hot_Tub_Monitor/blob/master/hot_tub_monitor.png?raw=true)
+![hot_tub_monitor.png](https://github.com/craigg96/Hot-Tub-Monitor/blob/master/hot_tub_monitor.png?raw=true)
 
 
  * This project is used to monitor hot tub water temp and ambient temp as well as current used. Sends the data to blynk cloud and displays on OLED screen
@@ -8,4 +8,3 @@
  * The non-invasive current sensor is the SCT-013
  * The mobile app logs temperatures, current, calculates cost and has control of the display
  
-![hot_tub_monitor.png](https://github.com/craigg96/Hot_Tub_Monitor/blob/master/hot_tub_monitor.png)
