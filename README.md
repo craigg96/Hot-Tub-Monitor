@@ -8,4 +8,4 @@
  * The non-invasive current sensor is the SCT-013
  * The mobile app logs temperatures, current, calculates cost and has control of the display
  
-![hot_tub_monitor.png](https://github.com/craigg96/Hot_Tub_Monitor/blob/master/hot_tub_monitor.png?raw=true)
+![hot_tub_monitor.png](https://github.com/craigg96/Hot_Tub_Monitor/blob/master/hot_tub_monitor.png)
