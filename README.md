@@ -3,6 +3,8 @@
  * The temperature sensors are DS18B20. There is one temperature probe for ambient and one for the water temperature.
  * The non-invasive current sensor is the SCT-013
  * The mobile app logs temperatures, current, calculates cost and has control of the display
+ 
+![Head_Unit.png](https://github.com/craigg96/raspberry_pi_car_head_unit/blob/master/Head_Unit.png?raw=true)
 
 ![image](https://github.com/craigg96/Hot_Tub_Monitor/blob/master/hot_tub_monitor.png?raw=true)
 
